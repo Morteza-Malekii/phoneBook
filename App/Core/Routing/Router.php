@@ -28,9 +28,10 @@ class Router
         foreach($middleware as $middleware_class)
         {
             $middleware_obj = new $middleware_class;
-            $middleware_obj->handle();
+            $response = $middleware_obj->handle();
+            if($response === false)
+            die();
         }
-        die();
     }
 
     public function findRoute(Request $request)
@@ -38,7 +39,7 @@ class Router
         foreach($this->routes as $route)
         {
             if (!in_array($request->method(),$route['methods']))
-                return false;
+                 continue;
             if ($this->regexMatched($route))
             return $route;
         }

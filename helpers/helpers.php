@@ -1,7 +1,7 @@
 <?php
 
 
-function site_url($route)
+function site_url($route='')
 {
     return rtrim($_ENV['HOST'], '/') . '/' . ltrim($route, '/');
 }
@@ -39,4 +39,9 @@ function nice_dd($var)
 {
     nice_dump($var);
     die();
+}
+
+function xss_clean($str)
+{
+    return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }

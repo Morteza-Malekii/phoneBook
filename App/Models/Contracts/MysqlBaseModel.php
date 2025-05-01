@@ -5,8 +5,13 @@ use Medoo\Medoo;
 
 class MysqlBaseModel extends BaseModel
 {
+    public $itemsPerPage;
+    public $visiblePages;
+
     public function __construct($id = null)
     {
+        $this->itemsPerPage = isset($_ENV['ITEMS_PER_PAGE']) ? (int) $_ENV['ITEMS_PER_PAGE'] : 10;
+        $this->visiblePages = isset($_ENV['VISIBLE_PAGE']) ? (int) $_ENV['VISIBLE_PAGE'] : 5;
         try {
             $this->connection = new Medoo([
                 'type' => 'mysql',
@@ -21,7 +26,6 @@ class MysqlBaseModel extends BaseModel
             	],
                 'logging' => true,
                 'prefix' => '',
-
             ]);
             }
         catch(\PDOException $e)
@@ -37,13 +41,13 @@ class MysqlBaseModel extends BaseModel
         $recordId = $this->{$this->primarykey};
         return $this->delete([$this->primarykey=>$recordId]);
     }
+
     public function save():int
     {
         $recordId = $this->{$this->primarykey};
         return $this->update($this->attributes,[$this->primarykey=>$recordId]);
     }
     
-
     public function create(array $data): int
     {
         $this->connection
@@ -60,17 +64,23 @@ class MysqlBaseModel extends BaseModel
         return $this;
     }
 
+    public function countRows()
+    {
+        return $this->connection->count($this->table);
+    }
+
     public function getAll():array
     {
-        $result = $this->connection
-        ->select($this->table, '*');
+        $result = $this->get('*',[]);
         return $result;
     }
 
-    function get(array $columns, array $where): array 
+    function get($columns, array $where): array 
     {
-        $result = $this->connection
-        ->select($this->table, $columns, $where);
+        $page = (isset($_GET['page']) && is_numeric($_GET['page'])) ? $_GET['page'] : 1;
+        $startPage = ($page-1)*$this->itemsPerPage;
+        $where['LIMIT'] = [$startPage, $this->itemsPerPage];
+        $result = $this->connection->select($this->table,'*',$where);
         return $result;
     }
 
@@ -86,5 +96,12 @@ class MysqlBaseModel extends BaseModel
         $result = $this->connection
         ->delete($this->table, $where);
         return $result->rowCount();
+    }
+
+    public function existsBy(string $column, mixed $value): bool
+    {
+        return $this->connection->has($this->table, [
+            $column => $value
+        ]);
     }
 }

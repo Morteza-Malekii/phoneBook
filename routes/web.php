@@ -1,8 +1,9 @@
 <?php
-
+use App\Middleware\GlobalMiddleware;
 use App\Core\Routing\Route;
 
-Route::get('/', 'Homecontroller@index');
+Route::post('/contact/add', 'ContactController@add',[GlobalMiddleware::class]);
+Route::get('/', 'Homecontroller@index',[GlobalMiddleware::class]);
 
 // Route::get('/null');
 // Route::add(['get' , 'post'], '/a' , function(){
