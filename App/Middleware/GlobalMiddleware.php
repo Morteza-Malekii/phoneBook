@@ -5,26 +5,17 @@ use App\Middleware\contract\MiddlewareContract;
 
 class GlobalMiddleware implements MiddlewareContract
 {
-        public function handle()
+    public function handle()
     {
-        $this->sanitizeGetParams();
-        $this->sanitizePostParams();
+        $this->sanitize($_GET);
+        $this->sanitize($_POST);
         return true;
     }
 
-    private function sanitizeGetParams()
+    private function sanitize(&$array)
     {
-        foreach ($_GET as $key => $value) {
-            $_GET[$key] = xss_clean($value);
+        foreach ($array as $key => $value) {
+            $array[$key] = htmlspecialchars(trim($value));
         }
     }
-
-    private function sanitizePostParams()
-    {
-        foreach ($_POST as $key => $value) {
-            $_POST[$key] = xss_clean($value);
-        }
-    }
-    
-
 }

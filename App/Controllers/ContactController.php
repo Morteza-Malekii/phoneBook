@@ -63,5 +63,21 @@ class ContactController
                         ->digits('phone');
         return $validator;
     }
+
+    public function delete()
+    {
+        #delete method
+        global $request;
+        $data = $request->params();
+        $contactId = $data['id'] ?? null;
+        $response = $this->contactModel->delete(['id'=>$contactId]);
+        if($response)
+        {
+            header('Location:'.site_url());
+        }else
+        {
+            $this->renderError('Invalid contact ID.');
+        }
+    }
 }
 

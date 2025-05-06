@@ -35,6 +35,7 @@
                     <th class="">Phone</th>
                     <th class="">E-mail</th>
                     <th class="">Created_at</th>   
+                    <th class="">status</th>   
                     </thead>
                     <tbody id="tableBody">
                         <?php foreach($contacts as $contact):?>
@@ -44,6 +45,13 @@
                                 <td class=""><?=$contact['mobile']?></td>
                                 <td class=""><?=$contact['email']?></td>
                                 <td class=""><?=$contact['created_at']?></td> 
+                                <td>
+                                    <form method="POST" action="<?= site_url() . 'contact/delete' ?>" onsubmit="return confirm('Are you sure delete <?= $contact['name'] ?> contact?')">
+                                        <input type="hidden" name="id" value="<?= $contact['id'] ?>">
+                                        <input type="hidden" name="csrf_token" value="<?= \App\Security\Csrf::generateToken() ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </td> 
                             </tr>
                         <?php endforeach ?>
                     </tbody>

@@ -3,6 +3,7 @@ namespace App\Core\Routing;
 
 use App\Core\Request;
 use App\Core\Routing\Route;
+use App\Middleware\GlobalMiddleware;
 use Exception;
 
 class Router 
@@ -17,7 +18,15 @@ class Router
         $this->request = new Request;
         $this->routes = Route::routes();
         $this->current_route = $this->findRoute($this->request) ?? null;
-        $this->run_route_middleware();
+    }
+
+    private function run_global_middleware()
+    {
+        $global_middleware = [GlobalMiddleware::class];
+        foreach ($global_middleware as $middleware_class) {
+            $middleware = new $middleware_class;
+            $middleware->handle();
+        }
     }
 
     private function run_route_middleware()
@@ -63,16 +72,16 @@ class Router
 
     public function run()
     {
-        # 405 error method is not valid 
+        $this->run_global_middleware();
+
         if ($this->invalidRequest())
             $this->dispatch405();
 
-        # error 404 uri not exist 
         if (is_null($this->current_route))
         {
             $this->dispatch404();
         }
-
+        $this->run_route_middleware();
         $this->dispatch();
     }
 
