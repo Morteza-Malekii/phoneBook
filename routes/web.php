@@ -5,7 +5,7 @@ use App\Middleware\CsrfMiddleware;
 
 Route::post('/contact/add', 'ContactController@add',[GlobalMiddleware::class]);
 Route::post('/contact/delete', 'ContactController@delete',[CsrfMiddleware::class]);
-Route::get('/','Homecontroller@index',[GlobalMiddleware::class]);
+Route::get('/','HomeController@index',[GlobalMiddleware::class]);
 
 // Route::get('/null');
 // Route::add(['get' , 'post'], '/a' , function(){
